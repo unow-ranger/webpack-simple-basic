@@ -232,7 +232,7 @@ npm run build
 
   webpack-dev-server主要的作用是用来 模拟服务器运行情况，进行上线前调试等。
 
-  <a href="devServer">关于webpack-dev-server的参数设置详细，点击此处查看</a>
+  <a href="#关于webpack-dev-server">关于webpack-dev-server的参数设置详细，点击此处查看</a>
 
 - **performance -  配置如何展示性能提示**
 
@@ -299,6 +299,6 @@ npm run build
 
 
 
-## <a name="devServer">关于webpack-dev-server</a>
+## 关于webpack-dev-server
 
 更新中...
