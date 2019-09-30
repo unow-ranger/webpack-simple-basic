@@ -299,6 +299,221 @@ npm run build
 
 
 
+## 2. 修改模版
+
+### 2.1. 整改webpack配置文件
+
+我们可以看到，webpack-simple的所有wepack配置项都放在webpack.config.js中，显然，在小项目中是可行的，但是转移到一个拥有繁多的开发环境配置项、生产环境配置项的庞大的项目上，则需要明确划分好webpack配置文件。
+
+#### 2.1.1. 整改准备
+
+- 在项目根目录下新建目录build，及config
+- 在config目录下创建文件index.js
+- 在build目录下创建文件webpack.dev.conf.js、webpack.prod.conf.js、webpack.base.js
+
+> -- config						#存放配置项变量
+>
+>  |-- index.js						##定义主要配置变量文件
+>
+> -- build						#引用config中的配置项变量和定义基本配置项
+>
+>  |-- webpack.base.js				##定义生产环境和开发环境共同需要的配置项
+>
+>  |-- webpack.dev.conf.js			##定义开发环境所需要的配置项信息
+>
+>  |-- webpack.prod.conf.js			##定义生产环境所需要的配置项信息
+
+![4](./assets/4.png)
+
+#### 2.1.2. 拆分webpack.config.js
+
+```bash
+# 后面拆分webpack配置文件，通过使用webpack-merge进行拼接多个子配置配置文件
+npm install webpack-merge@4.1.0 --save-dev
+```
+
+
+
+#### 2.1.3. 配置config/index.js
+
+```js
+/** index.js **/
+
+'use strict'
+const path = require('path')
+
+module.exports = {
+  /* 通用配置项 */
+    // 项目路径
+  context: path.resolve(__dirname, '../'), 
+  entry: './src/main.js',
+  filename: 'build.js',
+
+  // 开发环境配置变量
+  dev: {
+    /* devServer 配置项参数 */
+    host: 'localhost',
+    port: 8080,
+    historyApiFallback: true,
+    noInfo: true,
+    overlay: true,
+
+  },
+  // 生产环境配置变量
+  build: {
+    /* 打包路径 */
+    assetsRoot: path.resolve(__dirname, '../dist'),
+    assetsSubDirectory: 'static',
+    assetsPublicPath: '/',
+    devtool: '#source-map',
+  }
+}
+```
+
+#### 2.1.4. 配置build/webpack.base.conf.js
+
+```js
+/** webpack.base.conf.js **/
+/**
+ *  定义通用配置项的配置文件
+ */
+'use strict'
+const config = require('../config')
+const path = require('path')
+
+module.exports = {
+  context: config.context,
+  entry: {
+    app: config.entry,
+  },
+  output: {
+    path: config.build.assetsRoot,
+    publicPath: config.build.assetsPublicPath,
+    filename: config.filename,
+  },
+  resolve: {
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js',
+      '@': path.resolve(__dirname,'../src'),
+    },
+    extensions: ['*', '.js', '.vue', '.json']
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: [
+          'vue-style-loader',
+          'css-loader'
+        ],
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          'vue-style-loader',
+          'css-loader',
+          'sass-loader'
+        ],
+      },
+      ...
+    ]
+  },
+  plugins:[],
+  performance: {
+    hints: false
+  },
+}
+```
+
+#### 2.1.5. 配置build/webpack.dev.conf.js
+
+```js
+/** webpack.dev.conf.js **/
+/**
+ *  开发环境下的所有配置项集中在此文件中
+ */
+'use strict'
+const config = require('../config')
+const baseWebpackConfig = require('./webpack.base.conf')
+const merge = require('webpack-merge')
+
+// 将开发环境特有的配置项和通用配置项合并
+const devWebpackConfig = merge(baseWebpackConfig, {
+  devServer: {
+    host: config.dev.host,
+    port: config.dev.port,
+    historyApiFallback: config.dev.historyApiFallback,
+    noInfo: config.dev.noInfo,
+    overlay: config.dev.overlay,
+  },
+  devtool: '#eval-source-map',
+  plugins: baseWebpackConfig.plugins
+})
+
+module.exports = devWebpackConfig
+```
+
+#### 2.1.6. 配置build/webpack.prod.conf.js
+
+```js
+/** webpack.prod.conf.js **/
+
+/**
+ *  生产环境下的所有配置项集中在此文件中
+ */
+'use strict'
+var webpack = require('webpack')
+const baseWebpackConfig = require('./webpack.base.conf')
+const merge = require('webpack-merge')
+
+// 将生产环境特有的配置项和通用配置项合并
+const webpackConfig = merge(baseWebpackConfig, {
+  devtool: '#source-map',
+  plugins: (baseWebpackConfig.plugins || []).concat([
+    new webpack.DefinePlugin({
+      'process.env': {
+        NODE_ENV: '"production"'
+      }
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      sourceMap: true,
+      compress: {
+        warnings: false
+      }
+    }),
+    new webpack.LoaderOptionsPlugin({
+      minimize: true
+    })
+  ]) 
+})
+
+module.exports = webpackConfig
+```
+
+#### 2.1.7. 更改package.json
+
+引用指定的配置文件。
+
+```json
+"scripts": {
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.dev.conf.js --open --hot",
+    "build": "cross-env NODE_ENV=production webpack --config build/webpack.prod.conf.js --progress --hide-modules"
+  }
+```
+
+
+
+#### 2.1.8. 测试
+
+到这里，配置文件的拆分基本完成，同样的，输入命令测试开发环境配置和生产环境配置。 同时项目根目录下的webpack.config.js已经完全被我们划分的配置文件取代了，可将其删除。
+
+```bash
+npm run dev
+npm run build
+```
+
+
+
 ## 关于webpack-dev-server
 
 更新中...
