@@ -717,4 +717,109 @@ npm run build
 
 ## 关于webpack-dev-server
 
-更新中...
+1. **webpack-dev-server是什么？**
+   webpack-dev-server是一个轻量级的服务器，修改文件源码后，自动刷新页面将修改同步到页面上。
+
+2. **关于启动webpack-dev-server**
+
+   **启动webpack-dev-server有两种方式，分别为 cmd line 形式 和 Node.js API形式，本项目展示第一种。**
+
+- 安装webpack-dev-server
+
+  ```bash
+  # 这里根据本项目的安装的模块，安装相应的指定的版本
+  npm install --save-dev webpack-dev-server@2.9.1
+  ```
+
+- 在package.json中配置scripts
+
+  ```json
+  "scripts":{
+      "dev":"webpack-dev-server --config webpack.config.dev.js"
+  }
+  ```
+
+> --config webpack.config.dev.js 指定对应的开发环境配置参数文件
+
+- 命令行中输入命令启动
+
+  ```bash
+  npm run dev
+  ```
+
+3. **关于webpack-dev-server配置参数**
+
+   > 以下参数可在webpack.dev.conf.js配置文件中 devServer 项内配置
+
+   | 参数                                 | 说明                                                         |
+   | ------------------------------------ | ------------------------------------------------------------ |
+   | quiet {Boolean}                      | 控制台中不输出打包的信息，开发中一般设置为false，进行打印，这样查看错误比较方面 |
+   | no-info {Boolean}                    | 启用 noInfo 后，诸如「启动时和每次保存之后，那些显示的 webpack 包(bundle)信息」的消息将被隐藏。错误和警告仍然会显示 |
+   | compress {Boolean}                   | 是否开启gzip压缩。默认为false，不开启                        |
+   | host {ip}                            | 指定使用一个 host ip。默认是 localhost                       |
+   | port {Number}                        | 设置端口号，默认是:8080                                      |
+   | inline {Boolean}                     | 在 dev-server 的两种不同模式之间切换。默认情况(true)下，应用程序启用内联模式(inline mode)。这意味着一段**处理实时重载的脚本**被插入到包(bundle)中，并且构建消息将会出现在浏览器控制台。也可以使用iframe (false) 模式，它在通知栏下面使用`<iframe>` 标签，包含了关于构建的消息 |
+   | before {Function}                    | 提供在服务器内部所有其他中间件之前执行自定义中间件的能力。可用作接口调试 |
+   | proxy {Object}                       | 假若单独的后端开发服务器 API，并且希望在同域名下发送 API 请求。http可做HTTP代理 |
+   | hot {Boolean}                        | 是否开启热替换。默认为false，不开启（**若开启，插件必须要开启new webpack.HotModuleReplacementPlugin()**） |
+   | open {Boolean}                       | 是否自动打开浏览器。默认为false，不开启                      |
+   | contentBase {Boolean\|Array\|String} | 告诉服务器从哪里提供内容，如果不进行设定的话，默认是在当前目录下。只有在你想要提供静态文件时才需要。 |
+   | overlay {Boolean\|Object}            | 当有编译器错误或警告时，在浏览器中显示全屏覆盖。值为true时，只显示报错 |
+   | clientLogLevel {String}              | 当使用内联模式(inline mode)时，在开发工具的控制台将显示消息的等级。默认值为 info，可选值none, error, warning 或者 info |
+
+   例如：
+
+   ```js
+   module.exports = {
+       devServer: {
+           clientLogLevel: 'warning',
+           hot: true,
+           contentBase: false, 
+           compress: true,
+           host: HOST || config.dev.host,
+           port: PORT || config.dev.port,
+           open: config.dev.autoOpenBrowser,
+           overlay: config.dev.errorOverlay
+             ? { warnings: false, errors: true }
+             : false,
+           publicPath: config.dev.assetsPublicPath,
+           proxy: config.dev.proxyTable,
+           quiet: true, 
+         },
+   }
+   ```
+
+   
+
+4. **关于webpack-dev-server的命令行参数**
+
+   | 参数       | 说明                     |
+   | ---------- | ------------------------ |
+   | --progress | 显示打包的进度           |
+   | --compress | 开启gzip压缩             |
+   | --quiet    | 控制台中不输出打包的信息 |
+   | --inline   | 实时刷新                 |
+   | --config   | 指定配置文件             |
+
+5. **关于inline 和 hot**
+
+- **hot**，webpac-dev-server支持Hot Module Replacement (HRM)，即模块热替换，在前端代码变动的时候无需整个刷新页面，只把变化的部分替换掉。
+
+- **inline**，inline选项会为入口页面添加“热加载”功能，即代码改变后重新加载页面。
+
+  例如：
+
+  ```bash
+  #1. 不会刷新浏览器
+  webpack-dev-server
+  #2. 刷新浏览器
+  webpack-dev-server --inline
+  #3. 重新加载改变的部分，不会刷新页面
+  webpack-dev-server --hot
+  #4. 重新加载改变的部分，HRM失败则刷新页面
+  webpack-dev-server  --inline --hot
+  
+  ```
+
+- [关于 inline 的具体原理机制 及 其他相关内容](https://www.cnblogs.com/videring/articles/7641555.html)
+
