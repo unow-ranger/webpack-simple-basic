@@ -6,7 +6,6 @@
   "license": "sziit",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.dev.conf.js --open --hot",
     "build": "cross-env NODE_ENV=production webpack --config build/webpack.prod.conf.js --progress --hide-modules"
   },

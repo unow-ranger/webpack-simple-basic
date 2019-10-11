@@ -823,3 +823,32 @@ npm run build
 
 - [关于 inline 的具体原理机制 及 其他相关内容](https://www.cnblogs.com/videring/articles/7641555.html)
 
+
+
+## 关于cross-env
+
+1. **回顾package.json的scripts**
+
+   ```json
+   "scripts": {
+       "dev": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.dev.conf.js --open --hot",
+       "build": "cross-env NODE_ENV=production webpack --config build/webpack.prod.conf.js --progress --hide-modules"
+     },
+   ```
+
+   我们可以发现，开发环境调试命令和打包命令前都有这么一条命令**`cross-env NODE_ENV=`**。
+
+
+
+2. **NODE_ENV**
+
+   **NODE_ENV=** 是设置环境变量，如**NODE_ENV=development**，他可以作为一个标识，来匹配对应的一些配置。
+
+
+
+3. **cross-env**
+
+   由于在不同的操作系统下，其环境变量配置方式可能不同，所以cross-env是实现运行跨平台设置和使用环境变量的脚本，cross-env使得您可以使用单个命令，而不必担心为平台正确设置或使用环境变量。 
+
+
+
