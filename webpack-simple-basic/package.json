@@ -3,7 +3,7 @@
   "description": "A Vue.js project",
   "version": "1.0.0",
   "author": "unow-ranger <rangerunow@gmail.com>",
-  "license": "sziit",
+  "license": "SZIIT",
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config build/webpack.dev.conf.js --open --hot",
